@@ -10,19 +10,18 @@ The checker is deliberately conservative: it reports rules we can support with e
 - No runtime dependencies
 - Windows, Linux, or macOS
 
-## Run without installing
+## Run directly — no installation
 
-From the `ODFChecker` directory:
+From the repository root:
 
 ```bash
-PYTHONPATH=src python -m odfcheck /path/to/mod
+python ODFChecker/odfcheck.py /path/to/mod
 ```
 
-On PowerShell:
+Windows example:
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m odfcheck C:\path\to\mod
+python .\ODFChecker\odfcheck.py C:\Games\Battlezone98Redux\mods\MyMod
 ```
 
 The input can be:
@@ -31,7 +30,11 @@ The input can be:
 - a directory tree (all `.odf` files are scanned recursively); or
 - a `.zip` archive containing ODFs.
 
-## Install the CLI
+This direct launcher uses only the Python standard library. `pip`, setuptools, and a virtual environment are not required.
+
+## Optional installed CLI
+
+If you prefer an `odfcheck` command on your PATH:
 
 ```bash
 python -m pip install ./ODFChecker
@@ -61,19 +64,19 @@ azflmpit.odf:18: ERROR BZODF001
 Machine-readable output is available for CI/editor integration:
 
 ```bash
-odfcheck mod.zip --json
+python ODFChecker/odfcheck.py mod.zip --json
 ```
 
 By default the process exits non-zero only for `error` findings. To make warnings fail CI as well:
 
 ```bash
-odfcheck addon --fail-on warning
+python ODFChecker/odfcheck.py addon --fail-on warning
 ```
 
 To use the checker as a report-only tool:
 
 ```bash
-odfcheck addon --fail-on none
+python ODFChecker/odfcheck.py addon --fail-on none
 ```
 
 ## Initial Redux rules
@@ -102,8 +105,18 @@ This separation is important: future schema mining from `BZ1_Source` can expand 
 
 ## Tests
 
+The GitHub workflow runs the test suite without installing the package on Windows, Linux, and macOS under Python 3.10 and 3.12.
+
+Unix/macOS from the repository root:
+
 ```bash
-python -m pip install -e ./ODFChecker
+PYTHONPATH=ODFChecker/src python -m unittest discover -s ODFChecker/tests -v
+```
+
+PowerShell:
+
+```powershell
+$env:PYTHONPATH = "ODFChecker/src"
 python -m unittest discover -s ODFChecker/tests -v
 ```
 
