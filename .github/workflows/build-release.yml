@@ -1,0 +1,90 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            artifact-name: BZNConvert-windows
+            binary: BZNConvert-windows.exe
+          - os: ubuntu-latest
+            rid: linux-x64
+            artifact-name: BZNConvert-linux
+            binary: BZNConvert-linux
+          - os: macos-latest
+            rid: osx-x64
+            artifact-name: BZNConvert-macos
+            binary: BZNConvert-macos
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Build solution
+      run: dotnet build BZNTools.sln -c Release --nologo
+
+    - name: Publish BZNConvert
+      run: dotnet publish BZNConvert/BZNConvert.csproj -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishSingleFile=true -o dist
+
+    - name: Rename binary
+      shell: bash
+      run: |
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          mv dist/BZNConvert.exe dist/${{ matrix.binary }}
+        else
+          mv dist/BZNConvert dist/${{ matrix.binary }}
+          chmod +x dist/${{ matrix.binary }}
+        fi
+        ls -la dist/
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact-name }}
+        path: dist/${{ matrix.binary }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      continue-on-error: true
+
+    - name: List artifacts
+      run: |
+        echo "Artifacts downloaded:"
+        find . -type f -name "BZNConvert*" 2>/dev/null || echo "No artifacts found"
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          BZNConvert-windows/BZNConvert-windows.exe
+          BZNConvert-linux/BZNConvert-linux
+          BZNConvert-macos/BZNConvert-macos
+        fail_on_unmatched_files: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
