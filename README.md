@@ -2,7 +2,7 @@
 
 > **Reference-only fork.** This repository is retained primarily for its Battlezone BZN format documentation and parser implementation details. It is **not** the maintained packaged Battlezone BZN utility.
 >
-> For the supported user-facing tool, use **[Battlezone BZN Scanner](https://github.com/GrizzlyOne95/Battlezone98Redux_BZN_Scanner)** (`BZBZNScanner.exe`). New Battlezone-facing scanning, validation, diagnostics, and packaged tooling should live there.
+> For the supported user-facing tool, use **[Battlezone BZN Toolbox](https://github.com/GrizzlyOne95/Battlezone98Redux_BZN_Toolbox)** (`BZBZNToolbox.exe`). New Battlezone-facing scanning, validation, diagnostics, and packaged tooling should live there.
 
 ## Purpose
 
@@ -97,15 +97,15 @@ var bznFile = new BZNFileBattlezone(reader, Hints: hints);
 // Parsed data is then available through the BZNFileBattlezone model.
 ```
 
-## Relationship to Battlezone BZN Scanner
+## Relationship to Battlezone BZN Toolbox
 
 This repository should be used when we need to understand or cross-check **BZN serialization details, parser behavior, format differences, malformed-file handling, or conversion/reference logic**.
 
 The maintained product path is:
 
-**Battlezone98Redux_BZN_Scanner → `BZBZNScanner.exe`**
+**Battlezone98Redux_BZN_Toolbox → `BZBZNToolbox.exe`**
 
-If a useful parser insight from this repository should become a supported feature, port the relevant concept into BZN Scanner rather than reviving `BZNConvert` as a competing packaged utility.
+If a useful parser insight from this repository should become a supported feature, port the relevant concept into BZN Toolbox rather than reviving `BZNConvert` as a competing packaged utility.
 
 ## Repository Status
 
